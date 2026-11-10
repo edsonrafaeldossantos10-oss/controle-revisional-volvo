@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Controle Revisional Volvo – Protótipo</title>
+<style>
+:root{--y:#FBC02D;--bk:#0b0b0b;--card:#151515;--ln:#2a2a2a;--tx:#f2f2f2;--mu:#9a9a9a;--red:#e53935;--grn:#2e9e5b;--org:#f59e0b;--bg:#f4f4f2}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:#111}
+.tabs{display:flex;gap:8px;padding:16px;position:sticky;top:0;background:var(--bg);z-index:5;flex-wrap:wrap}
+.tabs button{border:0;padding:10px 18px;border-radius:999px;background:#ddd;font-weight:600;cursor:pointer}
+.tabs button.on{background:var(--bk);color:var(--y)}
+.note{margin:0 16px 12px;padding:10px 14px;background:#fff7dc;border-left:4px solid var(--y);border-radius:8px;font-size:13px}
+section{display:none;padding:0 16px 40px}section.on{display:block}
+/* SITE */
+.top{background:var(--bk);color:#fff;border-radius:14px;padding:18px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.top h1{margin:0;font-size:20px}.top small{color:var(--mu)}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.b-red{background:#3a1212;color:#ff8a80;border:1px solid var(--red)}.b-grn{background:#0f2a1b;color:#7ee2a8;border:1px solid var(--grn)}.b-org{background:#33240a;color:#ffcf70;border:1px solid var(--org)}.b-y{background:var(--y);color:#111}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+.kpi{background:#fff;border-radius:12px;padding:14px;border:1px solid #e5e5e5}.kpi b{font-size:26px;display:block}.kpi span{color:#666;font-size:13px}
+.kpi.red b{color:var(--red)}.kpi.org b{color:var(--org)}.kpi.grn b{color:var(--grn)}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;font-size:14px}
+th{background:var(--bk);color:var(--y);text-align:left;padding:10px;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+td{padding:10px;border-bottom:1px solid #eee}tr.sel td{background:#fffbea}
+.bar{height:8px;background:#e8e8e8;border-radius:9px;overflow:hidden;min-width:120px}.bar i{display:block;height:100%}
+.grid2{display:grid;grid-template-columns:1.1fr 1fr;gap:14px;margin-top:14px}@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+.panel{background:#fff;border-radius:12px;border:1px solid #e5e5e5;padding:16px}.panel h3{margin:0 0 12px;font-size:16px}
+.tl{position:relative;margin-left:8px;border-left:3px solid var(--y);padding-left:18px}
+.ev{position:relative;margin-bottom:14px;cursor:pointer;padding:10px 12px;border-radius:10px;border:1px solid #eee}
+.ev:hover,.ev.on{background:#fffbea;border-color:var(--y)}
+.ev:before{content:"";position:absolute;left:-28px;top:14px;width:13px;height:13px;border-radius:50%;background:var(--bk);border:3px solid var(--y)}
+.ev .d{font-weight:700}.ev .m{color:#666;font-size:13px}
+.chip{display:inline-block;padding:2px 8px;border-radius:6px;background:#f1f1f1;font-size:12px;margin:2px 4px 2px 0}
+.parts td{font-size:13px}.grp{background:#fafafa;font-weight:700;color:#444}
+/* APP */
+.phone{width:360px;max-width:100%;margin:0 auto;background:#fafafa;border-radius:34px;border:10px solid #111;overflow:hidden;box-shadow:0 20px 40px #0003}
+.ph-h{background:#000;color:#fff;padding:16px;text-align:center;font-weight:700;font-size:18px}
+.ph-b{padding:14px;display:flex;flex-direction:column;gap:12px}
+.veh{background:var(--y);border-radius:16px;padding:12px 14px;font-weight:800}
+.dk{background:#000;color:#fff;border-radius:18px;padding:16px;border:1px solid #3a3020}
+.big{font-size:30px;font-weight:800}.mu{color:var(--mu);font-size:13px}
+.pbar{height:12px;background:#2b2b2b;border-radius:9px;overflow:hidden;margin:10px 0 6px}.pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--grn),var(--org),var(--red))}
+.row{display:flex;justify-content:space-between;gap:8px}
+.mini{background:#151515;border-radius:12px;padding:10px;flex:1}.mini b{display:block;font-size:20px}
+.alert{display:flex;gap:8px;align-items:center;background:#2a0f0f;border:1px solid var(--red);color:#ffb4ab;border-radius:12px;padding:8px 10px;font-size:13px;margin-top:6px}
+.li{border-top:1px solid #2a2a2a;padding:10px 0;font-size:14px}.li:first-of-type{border-top:0}
+.foot{font-size:12px;color:#666;text-align:center}
+</style></head><body>
+<div class="tabs"><button class="on" onclick="show('site',this)">Site interno (detalhado)</button><button onclick="show('app',this)">App do motorista</button></div>
+<div class="note"><b>Protótipo para validação.</b> Dados reais do Volvo Connect para a placa RMY9G32 (visitas, KM, oficina e peças da OS 3089093). As peças das outras visitas, os motoristas, os contadores de vencidas/em dia e os "km para a próxima revisão" são <b>exemplos</b> até a integração automática.</div>
+
+<section id="site" class="on">
+ <div class="top"><div><h1>Controle Revisional · Volvo</h1><small>Só revisões feitas em concessionária Volvo · atualização automática diária · Volvo Connect 10/11/2026 10:41</small></div>
+ <span class="badge b-y">143 veículos Volvo conectados</span></div>
+ <div class="kpis">
+  <div class="kpi red"><b>12</b><span>Revisão vencida</span></div>
+  <div class="kpi org"><b>9</b><span>Vence em até 2.000 km ou 15 dias</span></div>
+  <div class="kpi grn"><b>122</b><span>Em dia</span></div>
+  <div class="kpi"><b>44</b><span>Com luz de alerta Volvo ativa</span></div>
+  <div class="kpi"><b>3,2 dias</b><span>Tempo médio parado na oficina</span></div>
+ </div>
+ <table><thead><tr><th>Placa</th><th>Situação</th><th>KM atual</th><th>Última revisão Volvo</th><th>Próxima</th><th>Progresso</th><th>Revisões 12m</th></tr></thead><tbody>
+  <tr class="sel"><td><b>RMY9G32</b><br><span class="mu">FH 540 · 2021</span></td><td><span class="badge b-org">Vence em 5 dias</span></td><td>475.907 km</td><td>08/05/2026 · 440.091 km</td><td>15/11/2026</td><td><div class="bar"><i style="width:92%;background:var(--org)"></i></div></td><td>6</td></tr>
+  <tr><td><b>SYJ6F93</b></td><td><span class="badge b-red">Vencida há 1.225 km</span></td><td>276.743 km</td><td>29/07/2026 · 255.518 km</td><td>275.518 km</td><td><div class="bar"><i style="width:100%;background:var(--red)"></i></div></td><td>—</td></tr>
+  <tr><td><b>RMW0D83</b></td><td><span class="badge b-grn">Em dia</span></td><td>471.4xx km</td><td>—</td><td>—</td><td><div class="bar"><i style="width:40%;background:var(--grn)"></i></div></td><td>—</td></tr>
+ </tbody></table>
+
+ <div class="grid2">
+  <div class="panel"><h3>Histórico de visitas Volvo · RMY9G32 <span class="chip">6 visitas em 12 meses</span> <span class="chip">3 passagens</span></h3>
+   <div class="tl" id="tl"></div>
+  </div>
+  <div class="panel" id="det"></div>
+ </div>
+</section>
+
+<section id="app">
+ <div class="phone"><div class="ph-h">Controle Revisional</div><div class="ph-b">
+  <div class="veh">🚚 Veículo vinculado: RMY9G32</div>
+  <div class="dk">
+   <div class="row"><span class="mu">Próxima revisão Volvo</span><span class="badge b-org">VENCE EM 5 DIAS</span></div>
+   <div class="big">Faltam 1.180 km</div><div class="mu">ou até 15/11/2026 — o que vier primeiro</div>
+   <div class="pbar"><i style="width:92%"></i></div>
+   <div class="row mu"><span>Última: 440.091 km</span><span>Atual: 475.907 km</span></div>
+   <div class="alert">⚠️ Luz de alerta: freio – procure a oficina</div>
+  </div>
+  <div class="row">
+   <div class="mini dk"><span class="mu">Revisões na Volvo</span><b>6</b><span class="mu">últimos 12 meses</span></div>
+   <div class="mini dk"><span class="mu">Última visita</span><b>08/05</b><span class="mu">Treviso P. Alegre</span></div>
+  </div>
+  <div class="dk"><div class="mu" style="margin-bottom:6px">O que foi trocado na última revisão</div>
+   <div class="li">⚙️ Caixa de mudanças – eixo principal recondicionado</div>
+   <div class="li">⛽ Combustível – válvula de descarga</div>
+   <div class="li">🛢️ Câmbio – conexão do resfriador de óleo</div>
+   <div class="li">🔧 Mangueiras, braçadeiras e presilhas</div>
+  </div>
+  <div class="dk"><div class="mu" style="margin-bottom:6px">Histórico</div>
+   <div class="li"><b>08/05/2026</b> · 440.091 km<br><span class="mu">Câmbio, combustível, fixações</span></div>
+   <div class="li"><b>27/02 a 02/03/2026</b> · 4 dias<br><span class="mu">3 ordens de serviço</span></div>
+   <div class="li"><b>21/11/2025</b><br><span class="mu">1 ordem de serviço</span></div>
+  </div>
+  <div class="foot">Atualizado automaticamente pela Volvo · 10/11/2026</div>
+ </div></div>
+</section>
+
+<script>
+function show(id,b){document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id==id));document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x==b))}
+const V=[
+{os:'3089093 + 3088574',ent:'08/05/2026',sai:'08/05/2026',dias:1,km:'440.091 km',mot:'(exemplo) João S.',real:true,parts:[
+ ['Caixa de mudanças mecânica',[['VO-4317300','Eixo principal, recondicionamento',1]]],
+ ['Resfriador de óleo, transmissão',[['VO-21380391','Conexão',1]]],
+ ['Combustível (depósito e tubos)',[['VO-21458307','Válvula de descarga',1]]],
+ ['Bomba injetora',[['VO-2360700','Válvula de alívio de pressão – substituição','0,4']]],
+ ['Tubos e mangueiras',[['VO-991083','Placa giratória',1],['VO-21339891','Mangueira','0,8']]],
+ ['Apoio e fixação',[['VO-983472','Presilha',2],['VO-948211','Braçadeira',10],['VO-980881','Braçadeira',1],['VO-994557','Braçadeira da mangueira',2]]]]},
+{os:'3022373 + 3022374 + 3022399',ent:'27/02/2026',sai:'02/03/2026',dias:4,km:'—',mot:'(exemplo) Carlos M.',parts:[]},
+{os:'3021035',ent:'21/11/2025',sai:'21/11/2025',dias:1,km:'—',mot:'(exemplo) João S.',parts:[]}];
+function det(i){const v=V[i];document.querySelectorAll('.ev').forEach((e,j)=>e.classList.toggle('on',i==j));
+ const n=v.parts.reduce((a,g)=>a+g[1].length,0);
+ document.getElementById('det').innerHTML=`<h3>Passagem ${v.ent}${v.sai!=v.ent?' a '+v.sai:''}</h3>
+ <div style="margin-bottom:10px"><span class="chip">OS ${v.os}</span><span class="chip">${v.dias} dia(s) parado</span><span class="chip">KM ${v.km}</span><span class="chip">Treviso Betim – Pouso Alegre/MG</span><span class="chip">Motorista: ${v.mot}</span>
+ ${n?'<span class="badge b-org">Trocou peças</span>':''}</div>
+ ${n?`<table class="parts"><thead><tr><th>Código</th><th>Peça / operação</th><th>Qtd</th></tr></thead><tbody>${v.parts.map(g=>`<tr class="grp"><td colspan=3>${g[0]}</td></tr>`+g[1].map(p=>`<tr><td>${p[0]}</td><td>${p[1]}</td><td>${p[2]}</td></tr>`).join('')).join('')}</tbody></table>`:'<p class="mu">Itens desta passagem entram com a integração (o Volvo Connect já tem o registro de serviço).</p>'}`}
+document.getElementById('tl').innerHTML=V.map((v,i)=>`<div class="ev" onclick="det(${i})"><div class="d">${v.ent}${v.sai!=v.ent?' → '+v.sai:''}</div><div class="m">OS ${v.os} · ${v.dias} dia(s) · ${v.mot}</div></div>`).join('');det(0);
+</script></body></html>
